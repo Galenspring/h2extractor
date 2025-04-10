@@ -9,8 +9,16 @@ def extract_h2_headings():
     data = request.get_json()
     url = data.get("url")
 
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/122.0.0.0 Safari/537.36"
+        )
+    }
+
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         return jsonify({"headings": [f"Error fetching page: {str(e)}"]})
@@ -18,3 +26,6 @@ def extract_h2_headings():
     soup = BeautifulSoup(response.text, "html.parser")
     h2s = [tag.get_text(strip=True) for tag in soup.find_all("h2")]
     return jsonify({"headings": h2s or ["No H2 headings found."]})
+
+if __name__ == "__main__":
+    app.run()
